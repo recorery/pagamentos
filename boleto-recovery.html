@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segunda via - Pagamento via Boleto | Recovery</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #eef8fa, #ffffff);
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .caixa {
+            width: 100%;
+            max-width: 430px;
+            padding: 28px 22px;
+            background: #ffffff;
+            border: 1px solid #c9e2e8;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 14px 40px rgba(13, 91, 110, 0.16);
+        }
+
+        .logo {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 16px;
+            padding: 8px;
+            display: block;
+            object-fit: contain;
+            background: #ffffff;
+            border: 2px solid #c4e0e6;
+            border-radius: 50%;
+            box-shadow: 0 6px 18px rgba(13, 91, 110, 0.18);
+        }
+
+        .linha {
+            width: 60px;
+            height: 4px;
+            margin: 0 auto 20px;
+            background: #147f91;
+            border-radius: 20px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: #25364d;
+            font-size: 25px;
+        }
+
+        .subtitulo {
+            margin: 0 0 18px;
+            color: #65758b;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .dados-pagamento {
+            margin-bottom: 18px;
+            padding: 14px;
+            background: #f0f8fa;
+            border: 1px solid #c4e0e6;
+            border-radius: 14px;
+        }
+
+        .texto-valor {
+            margin-bottom: 4px;
+            color: #6e7e93;
+            font-size: 13px;
+        }
+
+        .valor {
+            color: #0f7185;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .recebedor {
+            margin-top: 7px;
+            color: #52647b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .codigo-label {
+            margin: 0 0 8px;
+            color: #52647b;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        #codigoBarras {
+            width: 100%;
+            height: 120px;
+            margin: 0 0 16px;
+            padding: 12px;
+            border: 1px solid #c5dfe5;
+            border-radius: 12px;
+            background: #f4fafb;
+            color: #3e4c5f;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            word-break: break-all;
+        }
+
+        #codigoBarras:focus { border-color: #147f91; }
+
+        .botao {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #147f91;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(20, 127, 145, 0.28);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .botao:hover { background: #0e697b; }
+        .botao:active { transform: scale(0.98); }
+        .botao.copiado {
+            background: #78939a;
+            box-shadow: none;
+            font-size: 15px;
+        }
+
+        #mensagem {
+            min-height: 24px;
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .sucesso { color: #0b7183; }
+        .erro { color: #c62828; }
+
+        .orientacao {
+            margin: 16px 0 0;
+            color: #6b7b90;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .seguranca {
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid #edf1f6;
+            color: #8290a2;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+            }
+
+            .caixa {
+                margin-top: 10px;
+                padding: 24px 17px;
+                border-radius: 18px;
+            }
+
+            .logo {
+                width: 96px;
+                height: 96px;
+            }
+
+            h1 { font-size: 23px; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="caixa">
+        <img src="logo.png" alt="Recovery" class="logo">
+
+        <div class="linha"></div>
+
+        <h1>Pagamento via Boleto</h1>
+
+        <p class="subtitulo">
+            Confira os dados da sua segunda via e copie o código de barras abaixo para realizar o pagamento no aplicativo ou internet banking do seu banco.
+        </p>
+
+        <section class="dados-pagamento">
+            <div class="texto-valor">Valor do pagamento</div>
+            <div id="valorPagamento" class="valor">Carregando...</div>
+            <div id="dadosClienteExibicao" class="recebedor"></div>
+        </section>
+
+        <div class="codigo-label">Código de barras do boleto</div>
+
+        <textarea
+            id="codigoBarras"
+            readonly
+            aria-label="Código de barras do boleto"
+            placeholder="Carregando código de barras..."
+        ></textarea>
+
+        <button
+            id="copiarBoletoBtn"
+            type="button"
+            class="botao"
+            onclick="copiarCodigoBarras()"
+        >
+            Copiar código de barras
+        </button>
+
+        <div id="mensagem"></div>
+
+        <p class="orientacao">
+            Depois de copiar, abra o aplicativo do seu banco, escolha a opção de pagamento de boleto e cole o código de barras.
+        </p>
+
+        <div class="seguranca">
+            🔒 Ambiente seguro para pagamento
+        </div>
+    </main>
+
+    <script>
+        const parametros = new URLSearchParams(window.location.search);
+
+        const codigoBarrasRecebido = (
+            parametros.get("codigo_barras") || ""
+        ).trim();
+
+        const valorRecebido = (
+            parametros.get("valor_boleto") || ""
+        ).trim();
+
+        const nomeClienteRecebido = (
+            parametros.get("nomecliente_boleto") || ""
+        ).trim();
+
+        const cpfClienteRecebido = (
+            parametros.get("cpfcliente_boleto") || ""
+        ).trim();
+
+        const campoCodigo = document.getElementById("codigoBarras");
+        const mensagem = document.getElementById("mensagem");
+        const areaValor = document.getElementById("valorPagamento");
+        const areaDadosCliente = document.getElementById("dadosClienteExibicao");
+        const copiarBoletoBtn = document.getElementById("copiarBoletoBtn");
+
+        let codigoBarras = "";
+
+        iniciar();
+
+        function iniciar() {
+            try {
+                codigoBarras = prepararCodigoBarras(codigoBarrasRecebido);
+                const valor = prepararValor(valorRecebido);
+
+                if (!codigoBarras) {
+                    throw new Error("O código de barras do boleto não foi informado.");
+                }
+
+                campoCodigo.value = codigoBarras;
+                areaValor.textContent = valor ? formatarValorExibicao(valor) : "—";
+
+                const dados = [];
+                if (nomeClienteRecebido) dados.push("Nome: " + nomeClienteRecebido);
+                if (cpfClienteRecebido) dados.push("CPF: " + formatarCpf(cpfClienteRecebido));
+                areaDadosCliente.textContent = dados.join(" - ");
+
+            } catch (erro) {
+                console.error(erro);
+                mensagem.textContent = erro.message;
+                mensagem.className = "erro";
+                campoCodigo.value = "";
+                areaValor.textContent = "—";
+                areaDadosCliente.textContent = "";
+            }
+        }
+
+        function prepararCodigoBarras(codigo) {
+            return String(codigo || "")
+                .replace(/\s+/g, "")
+                .trim();
+        }
+
+        function prepararValor(valor) {
+            if (!valor) return "";
+
+            let valorLimpo = valor
+                .replace(/\s/g, "")
+                .replace(/R\$/gi, "");
+
+            if (valorLimpo.includes(".") && valorLimpo.includes(",")) {
+                valorLimpo = valorLimpo.replace(/\./g, "").replace(",", ".");
+            } else if (valorLimpo.includes(",")) {
+                valorLimpo = valorLimpo.replace(",", ".");
+            }
+
+            valorLimpo = valorLimpo.replace(/[^0-9.]/g, "");
+            const numero = Number(valorLimpo);
+
+            if (!Number.isFinite(numero) || numero <= 0) return "";
+            return numero.toFixed(2);
+        }
+
+        function formatarValorExibicao(valor) {
+            return Number(valor).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+        }
+
+        function formatarCpf(cpf) {
+            const numeros = String(cpf || "").replace(/\D/g, "");
+            if (numeros.length !== 11) return cpf;
+            return numeros.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+        }
+
+        async function copiarCodigoBarras() {
+            if (!codigoBarras) {
+                mensagem.textContent = "Código de barras indisponível.";
+                mensagem.className = "erro";
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(codigoBarras);
+                } else {
+                    copiarMetodoAlternativo();
+                }
+
+                mostrarSucesso();
+            } catch (erro) {
+                try {
+                    copiarMetodoAlternativo();
+                    mostrarSucesso();
+                } catch (erroAlternativo) {
+                    campoCodigo.focus();
+                    campoCodigo.select();
+                    mensagem.textContent = "Selecione o código acima e copie manualmente.";
+                    mensagem.className = "erro";
+                }
+            }
+        }
+
+        function copiarMetodoAlternativo() {
+            campoCodigo.focus();
+            campoCodigo.select();
+            campoCodigo.setSelectionRange(0, campoCodigo.value.length);
+
+            const copiou = document.execCommand("copy");
+            if (!copiou) throw new Error("Não foi possível copiar.");
+
+            const selecao = window.getSelection();
+            if (selecao) selecao.removeAllRanges();
+        }
+
+        function mostrarSucesso() {
+            mensagem.textContent = "✅ Código de barras copiado com sucesso!";
+            mensagem.className = "sucesso";
+            copiarBoletoBtn.textContent = "Copiar código de barras novamente";
+            copiarBoletoBtn.classList.add("copiado");
+        }
+    </script>
+
+</body>
+</html>
