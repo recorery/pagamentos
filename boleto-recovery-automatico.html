@@ -61,13 +61,14 @@ async function montar(d){
  $('viewer').style.display='block';$('actions').style.display='flex';$('status').style.display='none';pronto=true;atual=d;
  clearInterval(intervalo);clearInterval(consulta);
 }
+let novaTentativa404=null;
 async function verificar(){if(ocupado||pronto)return;ocupado=true;try{
  const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({acao:'consultarboleto',documento})});if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();
  if(d.status==='disponivel'&&d.disponivel&&d.codigoBarras){if(!d.numeroAcordo||!d.credora){status('Aguardando dados do acordo','O código foi localizado. Aguardando preenchimento do número do acordo (BV) e da credora (BW).');return}await montar(d);return}
  if(d.status==='nao_encontrado'){status('Cadastro não localizado','Não encontramos o CPF/CNPJ informado. Confira o link de atendimento.',false);clearInterval(consulta);return}
  if(d.status==='documento_invalido'){status('Documento inválido','O CPF/CNPJ recebido no link é inválido.',false);clearInterval(consulta);return}
  status('Estamos processando seu boleto para pagamento.','Assim que os dados estiverem disponíveis, esta página será atualizada automaticamente.');
- }catch(e){console.error(e);status('Aguardando conclusão do boleto',e.message||'Não foi possível concluir a consulta agora. Uma nova tentativa será realizada automaticamente.')}finally{ocupado=false}}
+ }catch(e){console.error('Falha na consulta do boleto:',e);status('Estamos processando seu boleto para pagamento.','A consulta está temporariamente indisponível. Tentaremos novamente automaticamente.');if(!novaTentativa404&&!pronto){novaTentativa404=setTimeout(()=>{novaTentativa404=null;verificar()},15000)}}finally{ocupado=false}}
 $('copy').onclick=async()=>{if(!atual)return;const s=String(atual.codigoBarras||'');try{await navigator.clipboard.writeText(s);$('feedback').textContent='Código copiado.'}catch(e){const t=document.createElement('textarea');t.value=s;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();$('feedback').textContent='Código copiado.'}};
 $('pdf').onclick=async()=>{if(!pronto)return;const b=$('pdf');b.disabled=true;try{await $('recoveryFrame').contentWindow.pdfBolRecovery()}catch(e){console.error(e);$('feedback').textContent='Não foi possível abrir o PDF: '+e.message}finally{b.disabled=false}};
 if(documento.length!==11&&documento.length!==14)status('CPF/CNPJ não informado','O link do ManyChat precisa incluir o parâmetro documento com CPF/CNPJ.',false);else{iniciarRelogio();verificar();consulta=setInterval(verificar,60000)}
