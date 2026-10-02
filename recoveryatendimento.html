@@ -134,6 +134,24 @@
     .back-choice-btn { margin-top:10px; background:#e8f1f3; color:#285661; box-shadow:none; border:1px solid #d1e1e4; }
     .back-choice-btn:hover:not(:disabled) { background:#deecef; color:#234e59; }
 
+
+    .direct-whatsapp-btn {
+      width:100%; min-height:64px; margin-top:13px; padding:12px 15px;
+      border:1.5px solid #c8dade; border-radius:12px; background:#fff;
+      color:#254851; text-decoration:none; box-shadow:none;
+      display:flex; align-items:center; gap:12px; text-align:left;
+      transition:.15s ease;
+    }
+    .direct-whatsapp-btn:hover {
+      background:#eef7f8; border-color:#176B78; transform:translateY(-1px);
+    }
+    .direct-icon {
+      width:38px; height:38px; flex:0 0 38px; border-radius:10px;
+      display:grid; place-items:center; background:#dceff1; font-size:20px;
+    }
+    .direct-whatsapp-btn strong { display:block; font-size:15px; color:#203f47; }
+    .direct-whatsapp-btn small { display:block; margin-top:4px; font-size:11.5px; font-weight:400; color:#718188; line-height:1.35; }
+
   </style>
 </head>
 <body>
@@ -148,30 +166,34 @@
         <section class="hero">
           <div class="eyebrow">Negociação simples e segura</div>
           <h1>Uma nova chance para <span>organizar sua vida financeira.</span></h1>
-          <p>Consulte suas condições de negociação de forma rápida. Para começar, informe seu CPF.</p>
+          <p>Escolha abaixo o assunto desejado e continue seu atendimento diretamente pelo WhatsApp.</p>
           <div class="benefits">
-            <div class="benefit"><span class="check">✓</span>Consulta rápida</div>
-            <div class="benefit"><span class="check">✓</span>Validação de identidade</div>
+            <div class="benefit"><span class="check">✓</span>Atendimento rápido</div>
+            <div class="benefit"><span class="check">✓</span>Acesso direto ao WhatsApp</div>
             <div class="benefit"><span class="check">✓</span>Processo simplificado</div>
           </div>
         </section>
 
         <section class="card">
-          <h2>Consulte suas condições</h2>
-          <div class="subtitle">Informe seu CPF para continuar o atendimento.</div>
+          <h2>Como podemos ajudar?</h2>
+          <div class="subtitle">Escolha uma opção para continuar seu atendimento pelo WhatsApp.</div>
 
-          <form id="consultaForm" autocomplete="off" novalidate>
-            <div class="field">
-              <label for="cpf">CPF</label>
-              <input id="cpf" name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" aria-describedby="cpfFeedback" />
-              <div id="cpfFeedback" class="feedback"></div>
-            </div>
+          <a class="direct-whatsapp-btn" href="https://wa.me/5511986109481?text=Ol%C3%A1%2C%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20tratar%20sobre%20minhas%20d%C3%ADvidas.">
+            <span class="direct-icon">💬</span>
+            <span><strong>Negociação de dívidas</strong><small>Consulte opções para negociação.</small></span>
+          </a>
 
-            <button type="submit" id="continueBtn" disabled>Continuar</button>
-            <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
-            <div class="privacy">Ao continuar, você confirma que o CPF informado é seu e autoriza o uso dessa informação para atendimento.</div>
-          </form>
+          <a class="direct-whatsapp-btn" href="https://wa.me/5511986109481?text=Ol%C3%A1%2C%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20solicitar%20minha%20segunda%20via.">
+            <span class="direct-icon">📄</span>
+            <span><strong>2º Via</strong><small>Solicite sua segunda via.</small></span>
+          </a>
 
+          <a class="direct-whatsapp-btn" href="https://wa.me/5511986109481?text=Ol%C3%A1%2C%20estou%20vindo%20pelo%20site%20e%20gostaria%20de%20falar%20com%20um%20atendente">
+            <span class="direct-icon">👤</span>
+            <span><strong>Atendimento humanizado</strong><small>Fale diretamente com um atendente.</small></span>
+          </a>
+
+          <div class="privacy">Ao selecionar uma opção, você será direcionado ao WhatsApp para continuar o atendimento.</div>
         </section>
       </main>
     </div>
@@ -179,13 +201,13 @@
     <section class="section">
       <div class="section-title">
         <small>Como funciona</small>
-        <h3>Consulte de forma simples e segura</h3>
-        <p>Você informa seus dados, confirmamos sua identidade e então podemos apresentar as próximas opções disponíveis para o atendimento.</p>
+        <h3>Atendimento simples e direto</h3>
+        <p>Escolha o assunto desejado e continue seu atendimento diretamente pelo WhatsApp.</p>
       </div>
       <div class="steps">
-        <article class="step"><div class="number">1</div><h4>Informe seu CPF</h4><p>O CPF é validado localmente pelos dígitos verificadores para evitar erros de digitação.</p></article>
-        <article class="step"><div class="number">2</div><h4>Validação automática</h4><p>Não é feita consulta externa de dados pessoais: o sistema apenas verifica se a estrutura do CPF é válida.</p></article>
-        <article class="step"><div class="number">3</div><h4>Continue no WhatsApp</h4><p>Com um CPF válido, você é direcionado ao WhatsApp para continuar o atendimento.</p></article>
+        <article class="step"><div class="number">1</div><h4>Escolha o assunto</h4><p>Selecione negociação de dívidas, segunda via ou atendimento humanizado.</p></article>
+        <article class="step"><div class="number">2</div><h4>Abra o WhatsApp</h4><p>O site prepara automaticamente a mensagem correspondente à opção escolhida.</p></article>
+        <article class="step"><div class="number">3</div><h4>Continue o atendimento</h4><p>Envie a mensagem pelo WhatsApp e prossiga com o atendimento.</p></article>
       </div>
     </section>
 
@@ -194,7 +216,7 @@
         <div class="lockbox">🔐</div>
         <div>
           <h3>Proteção dos seus dados</h3>
-          <p>A validação do CPF é feita diretamente no navegador pelos dígitos verificadores. Não há consulta a uma base externa nem uso de chave de API nesta etapa.</p>
+          <p>Nesta página não é necessário informar CPF ou outros dados pessoais. Você escolhe o assunto e continua o atendimento pelo WhatsApp.</p>
         </div>
       </div>
     </section>
@@ -205,91 +227,13 @@
         <h3>Antes de continuar</h3>
       </div>
       <div class="faq">
-        <details><summary>O CPF é consultado em alguma base externa?</summary><p>Não. Nesta etapa, o sistema apenas verifica localmente se os dígitos verificadores do CPF são válidos.</p></details>
-        <details><summary>Essa validação confirma a identidade do titular?</summary><p>Não. Ela confirma somente que o número informado possui uma estrutura de CPF válida. O atendimento continua pelo WhatsApp.</p></details>
-        <details><summary>O que acontece se o CPF for inválido?</summary><p>O sistema informa o erro e não libera o redirecionamento para o atendimento.</p></details>
+        <details><summary>Preciso informar meu CPF no site?</summary><p>Não. Nesta página não é necessário digitar o CPF. Basta escolher uma das opções de atendimento.</p></details>
+        <details><summary>Como continuo o atendimento?</summary><p>Ao clicar em uma opção, você será direcionado ao WhatsApp com a mensagem correspondente já preparada.</p></details>
+        <details><summary>Quais opções estão disponíveis?</summary><p>Negociação de dívidas, solicitação de segunda via e atendimento humanizado.</p></details>
       </div>
     </section>
 
     <footer><strong>Recovery</strong> · Consulta e negociação online · © 2026</footer>
   </div>
-
-  <script>
-    const WHATSAPP_ATENDIMENTO = '552139270967';
-
-    const cpfInput = document.getElementById('cpf');
-    const cpfFeedback = document.getElementById('cpfFeedback');
-    const continueBtn = document.getElementById('continueBtn');
-    const form = document.getElementById('consultaForm');
-    const formStatus = document.getElementById('formStatus');
-
-    function onlyDigits(value){ return String(value || '').replace(/\D/g,''); }
-
-    function formatCPF(value){
-      const d = onlyDigits(value).slice(0,11);
-      if(d.length <= 3) return d;
-      if(d.length <= 6) return d.slice(0,3)+'.'+d.slice(3);
-      if(d.length <= 9) return d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6);
-      return d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9)+'-'+d.slice(9);
-    }
-
-    function isValidCPF(cpf){
-      cpf = onlyDigits(cpf);
-      if(cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-      let sum = 0;
-      for(let i=0;i<9;i++) sum += Number(cpf[i])*(10-i);
-      let d1 = 11-(sum%11); if(d1>=10) d1=0;
-      if(d1 !== Number(cpf[9])) return false;
-      sum = 0;
-      for(let i=0;i<10;i++) sum += Number(cpf[i])*(11-i);
-      let d2 = 11-(sum%11); if(d2>=10) d2=0;
-      return d2 === Number(cpf[10]);
-    }
-
-    function processarCPF(){
-      cpfInput.value = formatCPF(cpfInput.value);
-      const digits = onlyDigits(cpfInput.value);
-      formStatus.className = 'form-status';
-      formStatus.textContent = '';
-
-      if(digits.length === 11){
-        if(isValidCPF(digits)){
-          cpfInput.classList.add('valid');
-          cpfInput.classList.remove('invalid');
-          cpfFeedback.textContent = 'CPF válido.';
-          cpfFeedback.className = 'feedback ok';
-          continueBtn.disabled = false;
-        } else {
-          cpfInput.classList.add('invalid');
-          cpfInput.classList.remove('valid');
-          cpfFeedback.textContent = 'Digite um CPF válido para continuar.';
-          cpfFeedback.className = 'feedback error';
-          continueBtn.disabled = true;
-        }
-      } else {
-        cpfInput.classList.remove('valid','invalid');
-        cpfFeedback.textContent = '';
-        cpfFeedback.className = 'feedback';
-        continueBtn.disabled = true;
-      }
-    }
-
-    cpfInput.addEventListener('input', processarCPF);
-    cpfInput.addEventListener('change', processarCPF);
-    cpfInput.addEventListener('blur', processarCPF);
-
-    form.addEventListener('submit', (event)=>{
-      event.preventDefault();
-      if(!isValidCPF(cpfInput.value)){
-        processarCPF();
-        return;
-      }
-      const cpf = formatCPF(cpfInput.value);
-      const destino = onlyDigits(WHATSAPP_ATENDIMENTO);
-      const mensagem = 'Olá, gostaria de continuar meu atendimento. Meu CPF é ' + cpf + '.';
-      const url = 'https://wa.me/' + destino + '?text=' + encodeURIComponent(mensagem);
-      window.location.href = url;
-    });
-  </script>
 </body>
 </html>
