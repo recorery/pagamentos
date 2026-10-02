@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento via PIX | Recovery</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #eefbff, #ffffff);
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .caixa {
+      width: 100%;
+      max-width: 430px;
+      padding: 28px 22px;
+      background: #ffffff;
+      border: 1px solid #d5edf5;
+      border-radius: 22px;
+      text-align: center;
+      box-shadow: 0 14px 40px rgba(0, 139, 180, 0.14);
+    }
+
+    .logo {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 16px;
+      padding: 8px;
+      display: block;
+      object-fit: contain;
+      background: #ffffff;
+      border: 2px solid #cdeaf3;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(0, 139, 180, 0.16);
+    }
+
+    .linha {
+      width: 60px;
+      height: 4px;
+      margin: 0 auto 20px;
+      background: #00a9c7;
+      border-radius: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: #25364d;
+      font-size: 25px;
+    }
+
+    .subtitulo {
+      margin: 0 0 18px;
+      color: #65758b;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .dados-pagamento {
+      margin-bottom: 18px;
+      padding: 14px;
+      background: #f1fbfe;
+      border: 1px solid #cdeaf3;
+      border-radius: 14px;
+    }
+
+    .texto-valor {
+      margin-bottom: 4px;
+      color: #6e7e93;
+      font-size: 13px;
+    }
+
+    .valor {
+      color: #008eb3;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .recebedor {
+      margin-top: 7px;
+      color: #52647b;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    #qrcode {
+      width: 260px;
+      min-height: 260px;
+      margin: 0 auto 22px;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px solid #d5edf5;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #qrcode img,
+    #qrcode canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    #codigoPix {
+      width: 100%;
+      height: 105px;
+      margin: 0 0 16px;
+      padding: 12px;
+      border: 1px solid #c9e8f1;
+      border-radius: 12px;
+      background: #f5fcfe;
+      color: #3e4c5f;
+      font-size: 13px;
+      line-height: 1.4;
+      resize: none;
+      outline: none;
+    }
+
+    #codigoPix:focus { border-color: #00a9c7; }
+
+    .botao {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #00a9c7;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 169, 199, 0.28);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .botao:hover { background: #008fb8; }
+    .botao:active { transform: scale(0.98); }
+
+    .botao:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    #mensagem {
+      min-height: 24px;
+      margin-top: 16px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .sucesso { color: #14885f; }
+    .erro { color: #c62828; }
+
+    .orientacao {
+      margin: 16px 0 0;
+      color: #6b7b90;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .seguranca {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #edf1f6;
+      color: #8290a2;
+      font-size: 12px;
+    }
+
+    .carregando {
+      color: #6b7b90;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .caixa {
+        margin-top: 10px;
+        padding: 24px 17px;
+        border-radius: 18px;
+      }
+
+      .logo {
+        width: 96px;
+        height: 96px;
+      }
+
+      #qrcode {
+        width: 240px;
+        min-height: 240px;
+      }
+
+      h1 { font-size: 23px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="caixa">
+
+    <img src="recovery_logo.jpeg" alt="Recovery" class="logo">
+
+    <div class="linha"></div>
+
+    <h1>Pagamento via PIX</h1>
+
+    <p class="subtitulo">
+      Seu PIX gerado com segurança pela Recovery.
+      Escaneie o QR Code ou copie o código PIX abaixo.
+    </p>
+
+    <section class="dados-pagamento">
+      <div class="texto-valor">Valor do pagamento</div>
+
+      <div id="valorPagamento" class="valor">
+        Carregando...
+      </div>
+
+      <div id="dadosClienteExibicao" class="recebedor"></div>
+    </section>
+
+    <div id="qrcode">
+      <span class="carregando">Gerando PIX...</span>
+    </div>
+
+    <textarea
+      id="codigoPix"
+      readonly
+      aria-label="Código PIX Copia e Cola"
+      placeholder="Gerando código PIX..."
+    ></textarea>
+
+    <button
+      id="botaoCopiar"
+      type="button"
+      class="botao"
+      onclick="copiarPix()"
+      disabled
+    >
+      Copiar código PIX
+    </button>
+
+    <div id="mensagem"></div>
+
+    <p class="orientacao">
+      Depois de copiar, abra o aplicativo do seu banco,
+      escolha a opção <strong>PIX Copia e Cola</strong>
+      e cole o código.
+    </p>
+
+    <div class="seguranca">
+      🔒 Ambiente seguro para pagamento
+    </div>
+
+  </main>
+
+  <script>
+    const WEB_APP_URL =
+      "https://script.google.com/macros/s/AKfycbzW7pKb62uWPeiCs6zif3_-xoGnoMwdS4jjnDOQk-bBDpDYa6Z6sX29VbroH4lBGH2X/exec";
+
+    const parametros = new URLSearchParams(window.location.search);
+
+    const valorRecebido = (parametros.get("valor_pix") || "").trim();
+    const nomeClienteRecebido = (parametros.get("nomecliente_pix") || "").trim();
+    const cpfClienteRecebido = (parametros.get("cpfcliente_pix") || "").trim();
+
+    const campoCodigo = document.getElementById("codigoPix");
+    const mensagem = document.getElementById("mensagem");
+    const areaQrCode = document.getElementById("qrcode");
+    const areaValor = document.getElementById("valorPagamento");
+    const areaDadosCliente = document.getElementById("dadosClienteExibicao");
+    const botaoCopiar = document.getElementById("botaoCopiar");
+
+    let codigoPix = "";
+
+    iniciar();
+
+    async function iniciar() {
+      try {
+        const cpf = String(cpfClienteRecebido || "").replace(/\D/g, "");
+        const valorNormalizado = prepararValor(valorRecebido);
+
+        if (cpf.length !== 11) {
+          throw new Error("CPF inválido para geração do PIX.");
+        }
+
+        if (!valorNormalizado) {
+          throw new Error("O valor do PIX não foi informado ou é inválido.");
+        }
+
+        areaValor.textContent = formatarValorExibicao(valorNormalizado);
+
+        const nomeExibicao = nomeClienteRecebido
+          ? formatarNomeExibicao(nomeClienteRecebido)
+          : "";
+
+        areaDadosCliente.textContent =
+          (nomeExibicao ? "Nome: " + nomeExibicao + " - " : "") +
+          "CPF: " + formatarCpf(cpf);
+
+        const resposta = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            acao: "deflowpix",
+            cpf: cpf,
+            valor: valorNormalizado
+          })
+        });
+
+        if (!resposta.ok) {
+          throw new Error("Falha ao comunicar com o servidor. HTTP " + resposta.status);
+        }
+
+        const dados = await resposta.json();
+
+        if (!dados || dados.sucesso !== true) {
+          throw new Error(
+            (dados && dados.mensagem)
+              ? dados.mensagem
+              : "Não foi possível gerar o PIX."
+          );
+        }
+
+        if (!dados.qrCopyPaste) {
+          throw new Error("A DeFlow não retornou o código PIX.");
+        }
+
+        codigoPix = dados.qrCopyPaste;
+        campoCodigo.value = codigoPix;
+
+        gerarQrCode(codigoPix);
+
+        botaoCopiar.disabled = false;
+
+        mensagem.textContent = "✅ PIX gerado com sucesso.";
+        mensagem.className = "sucesso";
+
+      } catch (erro) {
+        console.error(erro);
+
+        mensagem.textContent = erro.message || "Erro ao gerar o PIX.";
+        mensagem.className = "erro";
+
+        areaQrCode.innerHTML = "QR Code indisponível";
+        campoCodigo.value = "";
+        botaoCopiar.disabled = true;
+
+        if (!valorRecebido) {
+          areaValor.textContent = "—";
+        }
+
+      }
+    }
+
+    function prepararValor(valor) {
+      if (!valor) return "";
+
+      let valorLimpo = String(valor)
+        .replace(/\s/g, "")
+        .replace(/R\$/gi, "");
+
+      if (valorLimpo.includes(".") && valorLimpo.includes(",")) {
+        valorLimpo = valorLimpo
+          .replace(/\./g, "")
+          .replace(",", ".");
+      } else if (valorLimpo.includes(",")) {
+        valorLimpo = valorLimpo.replace(",", ".");
+      }
+
+      valorLimpo = valorLimpo.replace(/[^0-9.]/g, "");
+
+      const numero = Number(valorLimpo);
+
+      if (!Number.isFinite(numero) || numero <= 0) {
+        return "";
+      }
+
+      return numero.toFixed(2);
+    }
+
+    function formatarNomeExibicao(nome) {
+      return String(nome || "")
+        .toLowerCase()
+        .replace(/(?:^|\s)\S/g, function(letra) {
+          return letra.toUpperCase();
+        });
+    }
+
+    function formatarCpf(cpf) {
+      const numeros = String(cpf || "").replace(/\D/g, "");
+
+      if (numeros.length !== 11) {
+        return cpf;
+      }
+
+      return numeros.replace(
+        /(\d{3})(\d{3})(\d{3})(\d{2})/,
+        "$1.$2.$3-$4"
+      );
+    }
+
+    function gerarQrCode(texto) {
+      areaQrCode.innerHTML = "";
+
+      new QRCode(areaQrCode, {
+        text: texto,
+        width: 240,
+        height: 240,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    function formatarValorExibicao(valor) {
+      const numero = Number(valor);
+
+      return numero.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+    }
+
+    async function copiarPix() {
+      if (!codigoPix) {
+        mensagem.textContent = "Código PIX indisponível.";
+        mensagem.className = "erro";
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(codigoPix);
+        } else {
+          copiarMetodoAlternativo();
+        }
+
+        mostrarSucesso();
+
+      } catch (erro) {
+        try {
+          copiarMetodoAlternativo();
+          mostrarSucesso();
+        } catch (erroAlternativo) {
+          campoCodigo.focus();
+          campoCodigo.select();
+
+          mensagem.textContent =
+            "Selecione o código acima e copie manualmente.";
+
+          mensagem.className = "erro";
+        }
+      }
+    }
+
+    function copiarMetodoAlternativo() {
+      campoCodigo.focus();
+      campoCodigo.select();
+
+      campoCodigo.setSelectionRange(
+        0,
+        campoCodigo.value.length
+      );
+
+      const copiou = document.execCommand("copy");
+
+      if (!copiou) {
+        throw new Error("Não foi possível copiar.");
+      }
+
+      const selecao = window.getSelection();
+
+      if (selecao) {
+        selecao.removeAllRanges();
+      }
+    }
+
+    function mostrarSucesso() {
+      mensagem.textContent = "✅ Código PIX copiado com sucesso!";
+      mensagem.className = "sucesso";
+    }
+  </script>
+</body>
+</html>
