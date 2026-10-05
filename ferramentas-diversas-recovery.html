@@ -335,9 +335,11 @@ function organizar() {
     return;
   }
 
-  // Preserva o cabeçalho que vem antes do primeiro contrato (ex.: nome do cliente e quantidade de dívidas).
-  // Tudo que estiver antes de "Credor Original:" ou "Origem da dívida" será mantido no resultado.
-  const inicioContrato = entrada.search(/(?:Credor Original|Origem da dívida)\s*:/i);
+  // Preserva somente o cabeçalho do cliente.
+  // No Quero Quitar, o primeiro contrato pode começar diretamente em "Dias em atraso:",
+  // sem trazer "Credor Original:". Por isso, consideramos também esse rótulo
+  // (além de Origem da dívida) como possível início dos dados das dívidas.
+  const inicioContrato = entrada.search(/(?:Credor Original|Origem da dívida|Dias em atraso)\s*:/i);
   const cabecalhoCliente = inicioContrato > 0 ? entrada.substring(0, inicioContrato).trim() : '';
 
   const resultadoExtracao = extrairCampos(entrada);
